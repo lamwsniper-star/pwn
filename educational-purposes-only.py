@@ -126,20 +126,16 @@ class EducationalPurposesOnly(plugins.Plugin):
         logging.info('telling Bettercap to resume wifi recon...')
         requests.post('http://127.0.0.1:8081/api/session', data='{"cmd":"wifi.recon on"}', auth=('pwnagotchi', 'pwnagotchi'))
         
-       def on_epoch(self, agent, epoch, data):
-    # If not connected to a wireless network and mon0 doesn't exist, run _restart_monitor_mode function
-    wlan0_status = subprocess.run(['iwconfig', 'wlan0'], capture_output=True, text=True).stdout
-    mon0_status = subprocess.run(['iwconfig', 'mon0'], capture_output=True, text=True).stdout
-    
-    if "Not-Associated" in wlan0_status and "Monitor" not in mon0_status:
-        self._restart_monitor_mode()
+    def on_epoch(self, ui, agent, epoch, total_epochs):
+        # If not connected to a wireless network and mon0 doesn't exist, run _restart_monitor_mode function
+        if "Not-Associated" in subprocess.Popen('iwconfig wlan0').read() and "Monitor" not in subprocess.Popen('iwconfig mon0').read():
+            self._restart_monitor_mode()
         
     def on_wifi_update(self, agent, access_points):
         global READY
         global STATUS
         home_network = self.options['home-network']
-       wlan0_status = subprocess.run(['iwconfig', 'wlan0'], capture_output=True, text=True).stdout
-    if READY == 1 and "Not-Associated" in wlan0_status:
+        if READY == 1 and "Not-Associated" in os.popen('iwconfig wlan0').read():
             for network in access_points:
                 if network['hostname'] == home_network:
                     signal_strength = network['rssi']
