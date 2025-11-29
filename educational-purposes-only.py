@@ -126,7 +126,7 @@ class EducationalPurposesOnly(plugins.Plugin):
         logging.info('telling Bettercap to resume wifi recon...')
         requests.post('http://127.0.0.1:8081/api/session', data='{"cmd":"wifi.recon on"}', auth=('pwnagotchi', 'pwnagotchi'))
         
-    def on_epoch(self, ui, agent, epoch, total_epochs):
+    def on_epoch(self, ui, agent, epoch):
         # If not connected to a wireless network and mon0 doesn't exist, run _restart_monitor_mode function
         if "Not-Associated" in subprocess.Popen('iwconfig wlan0').read() and "Monitor" not in subprocess.Popen('iwconfig mon0').read():
             self._restart_monitor_mode()
